@@ -3,7 +3,7 @@ name: Playwright Tests
 on:
   push:
     branches:
-      - 'create-playwright-framework'
+      - 'create-playwright-framwork'
   workflow_dispatch:
 
 jobs:
