@@ -14,7 +14,6 @@ test.describe('SauceDemo login', () => {
     await loginPage.goto(qaCompanyPath);
     await loginPage.expectLoginPage();
   });
-
   test('logs in with valid credentials', async ({ loginPage }) => {
     await loginPage.login(qaCompanyUsername, qaCompanyPassword);
     await loginPage.expectLoggedIn();
