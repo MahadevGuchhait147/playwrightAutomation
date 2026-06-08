@@ -16,6 +16,9 @@ jobs:
     env:
       CURRENTS_PROJECT_ID: ${{ vars.CURRENTS_PROJECT_ID || 'ZxWc6z' }}
       CURRENTS_RECORD_KEY: ${{ secrets.CURRENTS_RECORD_KEY }}
+      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || secrets.QA_COMPANY_PATH || '/' }}
+      QA_COMPANY_USERNAME: ${{ secrets.QA_COMPANY_USERNAME }}
+      QA_COMPANY_PASSWORD: ${{ secrets.QA_COMPANY_PASSWORD }}
 
     steps:
       - name: Checkout repository
