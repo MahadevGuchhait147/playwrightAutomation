@@ -18,7 +18,6 @@ test.describe('SauceDemo login', () => {
     await loginPage.login(qaCompanyUsername, qaCompanyPassword);
     await loginPage.expectLoggedIn();
   });
-
   test('shows an error for invalid credentials', async ({ loginPage }) => {
     await loginPage.login(qaCompanyData.invalidUsername, qaCompanyData.invalidPassword);
     await loginPage.expectLoginError(qaCompanyData.invalidLoginError);
