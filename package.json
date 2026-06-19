@@ -1,0 +1,13 @@
+{
+  "name": "automation-demo",
+  "private": true,
+  "scripts": {
+    "test": "npm --prefix Playwright_Automation test",
+    "test:headed": "npm --prefix Playwright_Automation run test:headed",
+    "test:ui": "npm --prefix Playwright_Automation run test:ui",
+    "report": "npm --prefix Playwright_Automation run report",
+    "install:browsers": "npm --prefix Playwright_Automation run install:browsers",
+    "format": "npm --prefix Playwright_Automation run format",
+    "format:check": "npm --prefix Playwright_Automation run format:check"
+  }
+}
