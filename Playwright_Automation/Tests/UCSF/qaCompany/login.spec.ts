@@ -2,10 +2,9 @@ import { test } from '../../../Support/Fixture/login';
 import qaCompanyData from '../../../Support/TestData/qaCompany.json';
 
 test.describe('SauceDemo login', () => {
-  test.beforeEach(async ({ loginPage, eyes }) => {
+  test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto(process.env.QA_COMPANY_PATH ?? '/');
     await loginPage.expectLoginPage();
-    await eyes.check('Login page');
   });
 
   test('logs in with valid credentials', async ({ loginPage }) => {

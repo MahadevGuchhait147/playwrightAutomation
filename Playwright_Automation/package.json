@@ -13,8 +13,6 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
-    "@applitools/eyes-playwright": "^1.47.5",
-    "@currents/playwright": "^2.3.0",
     "@playwright/test": "latest",
     "@reportportal/agent-js-playwright": "^5.4.1",
     "@types/node": "^25.9.2",

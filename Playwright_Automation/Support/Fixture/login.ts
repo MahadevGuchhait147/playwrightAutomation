@@ -1,4 +1,4 @@
-import { test as base, expect } from '@applitools/eyes-playwright/fixture';
+import { test as base, expect } from '@playwright/test';
 import { LoginPage } from '../pageMethod/LoginPage';
 
 type PageFixtures = {
