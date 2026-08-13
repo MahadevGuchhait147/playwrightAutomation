@@ -15,7 +15,7 @@ test.describe('SauceDemo login', () => {
   });
 
   test('logs in with valid credentials', async ({ loginPage }) => {
-    const username = process.env.QA_COMPANY_USERNME;
+    const username = process.env.QA_COMPANY_USERNAME;
     const password = process.env.QA_COMPANY_PASSWORD;
 
     if (!username || !password) {
