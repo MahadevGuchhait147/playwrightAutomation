@@ -9,7 +9,7 @@ export default defineConfig({
   timeout: 30_000,
 
   expect: {
-    timeout: 5_000,
+    timeout: 5_000
   },
 
   fullyParallel: true,
@@ -20,10 +20,7 @@ export default defineConfig({
 
   workers: 1,
 
-  reporter: [
-    ['list'],
-    ['html', { open: 'never' }],
-  ],
+  reporter: [['list'], ['html', { open: 'never' }]],
 
   use: {
     baseURL: process.env.BASE_URL ?? 'https://www.saucedemo.com',
@@ -36,17 +33,17 @@ export default defineConfig({
 
     actionTimeout: 10_000,
 
-    navigationTimeout: 30_000,
+    navigationTimeout: 30_000
   },
 
   projects: [
     {
       name: 'chromium',
       use: {
-        ...devices['Desktop Chrome'],
-      },
-    },
+        ...devices['Desktop Chrome']
+      }
+    }
   ],
 
-  outputDir: 'test-results',
+  outputDir: 'test-results'
 });

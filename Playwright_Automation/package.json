@@ -13,10 +13,12 @@
     "format:check": "prettier --check ."
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "latest",
     "@reportportal/agent-js-playwright": "^5.4.1",
     "@types/node": "^25.9.2",
     "dotenv": "^17.4.2",
+    "knip": "^6.32.0",
     "prettier": "^3.8.4",
     "typescript": "latest"
   }

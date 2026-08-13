@@ -36,8 +36,8 @@ export class LoginPage {
   }
 
   async expectLoggedIn(): Promise<void> {
-   // await expect(this.page).toHaveURL(/.*inventory\.html/);
-   // await expect(this.page.locator('[data-test="title"]')).toHaveText('Products');
+    // await expect(this.page).toHaveURL(/.*inventory\.html/);
+    // await expect(this.page.locator('[data-test="title"]')).toHaveText('Products');
   }
 
   async expectLoginError(message: string): Promise<void> {

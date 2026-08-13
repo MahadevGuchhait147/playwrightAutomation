@@ -8,6 +8,36 @@
     "report": "npm --prefix Playwright_Automation run report",
     "install:browsers": "npm --prefix Playwright_Automation run install:browsers",
     "format": "npm --prefix Playwright_Automation run format",
-    "format:check": "npm --prefix Playwright_Automation run format:check"
+    "format:check": "npm --prefix Playwright_Automation run format:check",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.12.1",
+    "@playwright/test": "^1.62.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.9.6"
+  },
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "axe-core": "^4.12.1",
+    "playwright-core": "^1.62.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Mahadev-clanap/Automation-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Mahadev-clanap/Automation-demo/issues"
+  },
+  "homepage": "https://github.com/Mahadev-clanap/Automation-demo#readme",
+  "lint-staged": {
+    "Playwright_Automation/**/*.{ts,js,json,yml,yaml,md}": "prettier --write --config Playwright_Automation/.prettierrc"
   }
 }
