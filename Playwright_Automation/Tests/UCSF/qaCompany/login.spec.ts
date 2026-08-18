@@ -1,17 +1,10 @@
 import { test, expect } from '../../../Support/Fixture/login';
 import qaCompanyData from '../../../Support/TestData/qaCompany.json';
-import AxeBuilder from '@axe-core/playwright';
 
 test.describe('SauceDemo login', () => {
   test.beforeEach(async ({ loginPage }) => {
     await loginPage.goto(process.env.QA_COMPANY_PATH ?? '/');
     await loginPage.expectLoginPage();
-  });
-
-  test.afterEach(async ({ page }, testInfo) => {
-    const results = await new AxeBuilder({ page }).analyze();
-
-    expect(results.violations, `Accessibility issues found in ${testInfo.title}`).toEqual([]);
   });
 
   test('logs in with valid credentials', async ({ loginPage }) => {

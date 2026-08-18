@@ -3,6 +3,9 @@
   "private": true,
   "scripts": {
     "test": "npm --prefix Playwright_Automation test",
+    "test:unit": "vitest run --config vitest.config.mjs",
+    "test:unit:watch": "vitest --config vitest.config.mjs",
+    "test:mutation": "stryker run",
     "test:headed": "npm --prefix Playwright_Automation run test:headed",
     "test:ui": "npm --prefix Playwright_Automation run test:ui",
     "report": "npm --prefix Playwright_Automation run report",
@@ -12,17 +15,22 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "^1.62.1",
+    "@stryker-mutator/core": "^9.6.1",
+    "@stryker-mutator/typescript-checker": "^9.6.1",
+    "@stryker-mutator/vitest-runner": "^9.6.1",
+    "@types/node": "^26.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "prettier": "^3.9.6"
+    "prettier": "^3.9.6",
+    "typescript": "^5.7.3",
+    "vitest": "^4.1.10"
   },
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "axe-core": "^4.12.1",
+    "@testdino/playwright": "^2.3.1",
     "playwright-core": "^1.62.1"
   },
   "repository": {

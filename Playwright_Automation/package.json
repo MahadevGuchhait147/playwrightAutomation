@@ -10,10 +10,12 @@
     "report": "playwright show-report",
     "install:browsers": "playwright install",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test:unit": "vitest run --config ../vitest.config.mjs",
+    "test:unit:watch": "vitest --config ../vitest.config.mjs",
+    "test:mutation": "stryker run --configFile ../stryker.conf.json"
   },
   "devDependencies": {
-    "@axe-core/playwright": "^4.12.1",
     "@playwright/test": "latest",
     "@reportportal/agent-js-playwright": "^5.4.1",
     "@types/node": "^25.9.2",
