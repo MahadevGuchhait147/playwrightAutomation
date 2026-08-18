@@ -2,6 +2,7 @@
   "name": "playwright-automation",
   "version": "1.0.0",
   "private": true,
+  "type": "module",
   "description": "Playwright TypeScript automation framework.",
   "scripts": {
     "test": "playwright test",

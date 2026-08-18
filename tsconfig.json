@@ -11,7 +11,8 @@
     "noEmit": true
   },
   "include": [
-    "Playwright_Automation/Support/**/*.ts",
+    "Playwright_Automation/Support/Utils/**/*.ts",
+    "Playwright_Automation/Support/pageMethod/**/*.ts",
     "Playwright_Automation/Tests/unit/**/*.ts"
   ]
 }

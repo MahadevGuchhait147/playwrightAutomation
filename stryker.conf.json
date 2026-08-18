@@ -11,7 +11,7 @@
     "Playwright_Automation/Support/pageMethod/LoginPage.ts"
   ],
   "vitest": {
-    "configFile": "vitest.config.mjs"
+    "configFile": "vitest.stryker.config.mjs"
   },
   "thresholds": {
     "high": 80,
