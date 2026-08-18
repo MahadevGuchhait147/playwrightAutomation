@@ -5,6 +5,8 @@ loadEnv({ quiet: true });
 
 export default defineConfig({
   testDir: './Tests',
+  testMatch: '**/*.spec.ts',
+  testIgnore: '**/unit/**/*.test.ts',
 
   timeout: 30_000,
 
