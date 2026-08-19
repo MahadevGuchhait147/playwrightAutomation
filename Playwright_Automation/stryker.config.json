@@ -14,9 +14,12 @@
     ".stryker-tmp",
     "tests"
   ],
-  "reporters": ["html", "clear-text", "progress"],
+  "reporters": ["html", "json", "clear-text", "progress"],
   "htmlReporter": {
     "fileName": "stryker-report/index.html"
+  },
+  "jsonReporter": {
+    "fileName": "stryker-report/mutation.json"
   },
   "coverageAnalysis": "off",
   "timeoutMS": 10000

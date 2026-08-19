@@ -40,7 +40,55 @@ jobs:
         run: npm run test:unit
 
       - name: Run Stryker
+        env:
+          GITHUB_ACTIONS: ''
         run: npm run test:mutate
+
+      - name: Show Stryker results
+        if: always()
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const reportPath = 'stryker-report/mutation.json';
+          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+          if (!fs.existsSync(reportPath) || !summaryPath) {
+            console.log('Stryker JSON report not found.');
+            process.exit(0);
+          }
+          const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+          const mutants = Object.values(report.files || {}).flatMap((file) => file.mutants || []);
+          const counts = mutants.reduce((acc, mutant) => {
+            acc[mutant.status] = (acc[mutant.status] || 0) + 1;
+            return acc;
+          }, {});
+          const killed = counts.Killed || 0;
+          const survived = counts.Survived || 0;
+          const noCoverage = counts.NoCoverage || 0;
+          const timeout = counts.Timeout || 0;
+          const total = mutants.length;
+          const detected = killed + (counts.Timeout || 0) + (counts.RuntimeError || 0) + (counts.CompileError || 0);
+          const covered = total - noCoverage;
+          const score = total ? ((detected / total) * 100).toFixed(2) : '0.00';
+          const coveredScore = covered ? ((killed / covered) * 100).toFixed(2) : '0.00';
+          const lines = [
+            '## Stryker mutation report',
+            '',
+            `| Metric | Count |`,
+            `| --- | ---: |`,
+            `| Total mutants | ${total} |`,
+            `| Killed | ${killed} |`,
+            `| Survived | ${survived} |`,
+            `| No coverage | ${noCoverage} |`,
+            `| Timeout | ${timeout} |`,
+            `| Mutation score | ${score}% |`,
+            `| Score (covered) | ${coveredScore}% |`,
+            '',
+            'Download the **stryker-report** artifact and open `index.html` for the full HTML report.',
+            '',
+          ];
+          fs.appendFileSync(summaryPath, lines.join('\n'));
+          console.log(lines.join('\n'));
+          EOF
 
       - name: Upload Stryker report
         if: always()
@@ -48,7 +96,7 @@ jobs:
         with:
           name: stryker-report
           path: Playwright_Automation/stryker-report
-          if-no-files-found: ignore
+          if-no-files-found: warn
 
   e2e-test:
     runs-on: ubuntu-latest
