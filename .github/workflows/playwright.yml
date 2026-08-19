@@ -18,11 +18,16 @@ concurrency:
 jobs:
   mutate:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 90
 
     defaults:
       run:
         working-directory: Playwright_Automation
+
+    env:
+      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || '/bank/login' }}
+      QA_COMPANY_USERNAME: ${{ secrets.QA_COMPANY_USERNAME }}
+      QA_COMPANY_PASSWORD: ${{ secrets.QA_COMPANY_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v4
@@ -35,6 +40,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Install browsers
+        run: npx playwright install --with-deps chromium
 
       - name: Run Vitest
         run: npx vitest run --reporter=json --outputFile=vitest-report.json
