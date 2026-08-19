@@ -3,14 +3,21 @@
   "packageManager": "npm",
   "testRunner": "vitest",
   "vitest": {
-    "configFile": "vitest.config.ts"
+    "configFile": "vitest.config.ts",
+    "related": false
   },
   "mutate": ["utils/helpers.ts"],
-  "ignorePatterns": ["playwright-report", "test-results", "stryker-report", ".stryker-tmp"],
+  "ignorePatterns": [
+    "playwright-report",
+    "test-results",
+    "stryker-report",
+    ".stryker-tmp",
+    "tests"
+  ],
   "reporters": ["html", "clear-text", "progress"],
   "htmlReporter": {
     "fileName": "stryker-report/index.html"
   },
   "coverageAnalysis": "off",
-  "timeoutMS": 60000
+  "timeoutMS": 10000
 }

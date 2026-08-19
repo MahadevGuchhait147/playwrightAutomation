@@ -8,7 +8,6 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "test:unit": "vitest run",
-    "test:unit:watch": "vitest",
     "test:mutate": "stryker run",
     "report": "playwright show-report",
     "install:browsers": "playwright install",

@@ -5,6 +5,7 @@ loadEnv({ quiet: true });
 
 const baseUrl = process.env.BASE_URL ?? 'https://qaplayground.com';
 const isCI = !!process.env.CI;
+const isStryker = process.env.STRYKER === '1';
 
 export default defineConfig({
   // Test discovery
@@ -18,18 +19,20 @@ export default defineConfig({
   },
   fullyParallel: true,
   forbidOnly: isCI,
-  retries: isCI ? 1 : 0,
+  retries: isStryker ? 0 : isCI ? 1 : 0,
   workers: 1,
 
   // Reporters
-  reporter: [['list'], ['html', { open: 'never', outputFolder: './playwright-report' }]],
+  reporter: isStryker
+    ? [['dot']]
+    : [['list'], ['html', { open: 'never', outputFolder: './playwright-report' }]],
 
   // Shared browser context options
   use: {
     baseURL: baseUrl,
-    trace: 'on',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    trace: isStryker ? 'off' : 'on',
+    screenshot: isStryker ? 'off' : 'only-on-failure',
+    video: isStryker ? 'off' : 'retain-on-failure',
     actionTimeout: 10_000,
     navigationTimeout: 30_000
   },

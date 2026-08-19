@@ -4,6 +4,6 @@ test-results/
 playwright-report/
 stryker-report/
 .stryker-tmp/
-storageState.json
+.stryker-incremental.json
 .env
 .DS_Store
