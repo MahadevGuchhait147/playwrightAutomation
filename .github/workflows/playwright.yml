@@ -37,11 +37,38 @@ jobs:
         run: npm ci
 
       - name: Run Vitest
-        run: npm run test:unit
+        run: npx vitest run --reporter=json --outputFile=vitest-report.json
+
+      - name: Show Vitest results
+        if: always()
+        run: |
+          node <<'EOF'
+          const fs = require('fs');
+          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+          const reportPath = 'vitest-report.json';
+          if (!summaryPath) process.exit(0);
+          let body = '## Vitest\n\nNo vitest-report.json was produced.\n';
+          if (fs.existsSync(reportPath)) {
+            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
+            body = [
+              '## Vitest',
+              '',
+              `| Metric | Count |`,
+              `| --- | ---: |`,
+              `| Test files | ${report.numTotalTestSuites ?? 0} |`,
+              `| Passed | ${report.numPassedTests ?? 0} |`,
+              `| Failed | ${report.numFailedTests ?? 0} |`,
+              `| Total tests | ${report.numTotalTests ?? 0} |`,
+              '',
+            ].join('\n');
+          }
+          fs.appendFileSync(summaryPath, body);
+          EOF
 
       - name: Run Stryker
         env:
-          GITHUB_ACTIONS: ''
+          GITHUB_ACTIONS: 'false'
+          GITHUB_STEP_SUMMARY: /dev/null
         run: npm run test:mutate
 
       - name: Show Stryker results
@@ -83,7 +110,7 @@ jobs:
             `| Mutation score | ${score}% |`,
             `| Score (covered) | ${coveredScore}% |`,
             '',
-            'Download the **stryker-report** artifact and open `index.html` for the full HTML report.',
+            'GitHub Pages: [Stryker report](https://mahadev-clanap.github.io/Automation-demo/stryker/)',
             '',
           ];
           fs.appendFileSync(summaryPath, lines.join('\n'));
@@ -128,16 +155,67 @@ jobs:
       - name: Run Playwright tests
         run: npm test
 
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: Playwright_Automation/playwright-report
+          if-no-files-found: warn
+
+  pages:
+    needs: [mutate, e2e-test]
+    if: always() && !cancelled()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Playwright report
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report
+          path: site/playwright
+
+      - name: Download Stryker report
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          name: stryker-report
+          path: site/stryker
+
+      - name: Create report home page
+        run: |
+          mkdir -p site
+          cat > site/index.html <<'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1" />
+              <title>Automation-demo reports</title>
+              <style>
+                body { font-family: sans-serif; max-width: 640px; margin: 48px auto; padding: 0 16px; }
+                a { display: block; margin: 12px 0; font-size: 1.1rem; }
+              </style>
+            </head>
+            <body>
+              <h1>Automation-demo reports</h1>
+              <a href="./playwright/index.html">Playwright e2e report</a>
+              <a href="./stryker/index.html">Stryker mutation report</a>
+            </body>
+          </html>
+          EOF
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload Playwright Report
+      - name: Upload GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: Playwright_Automation/playwright-report
+          path: site
 
   deploy:
-    needs: [mutate, e2e-test]
+    needs: pages
 
     environment:
       name: github-pages

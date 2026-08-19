@@ -5,5 +5,6 @@ playwright-report/
 stryker-report/
 .stryker-tmp/
 .stryker-incremental.json
+vitest-report.json
 .env
 .DS_Store
