@@ -16,7 +16,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  unit-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: Playwright_Automation
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Playwright_Automation/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run mutation tests
+        run: npm run test:mutate
+
+      - name: Upload Stryker report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stryker-report
+          path: Playwright_Automation/stryker-report
+          if-no-files-found: ignore
+
+  e2e-test:
     runs-on: ubuntu-latest
 
     defaults:
@@ -24,7 +57,7 @@ jobs:
         working-directory: Playwright_Automation
 
     env:
-      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || '/' }}
+      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || '/bank/login' }}
       QA_COMPANY_USERNAME: ${{ secrets.QA_COMPANY_USERNAME }}
       QA_COMPANY_PASSWORD: ${{ secrets.QA_COMPANY_PASSWORD }}
 
@@ -35,21 +68,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            Playwright_Automation/package-lock.json
-
-      - name: Install root dependencies
-        run: npm ci
-        working-directory: .
-
-      - name: Run unit tests (Vitest)
-        run: npm run test:unit
-        working-directory: .
-
-      - name: Run mutation tests (Stryker)
-        run: npm run test:mutation
-        working-directory: .
+          cache-dependency-path: Playwright_Automation/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -57,7 +76,7 @@ jobs:
       - name: Install browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run tests
+      - name: Run Playwright tests
         run: npm test
 
       - name: Setup Pages
@@ -69,7 +88,7 @@ jobs:
           path: Playwright_Automation/playwright-report
 
   deploy:
-    needs: test
+    needs: [unit-test, e2e-test]
 
     environment:
       name: github-pages

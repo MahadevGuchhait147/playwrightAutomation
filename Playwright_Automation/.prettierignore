@@ -1,6 +1,8 @@
 node_modules
+../artifacts
 test-results
 playwright-report
+stryker-report
+.stryker-tmp
 blob-report
 .env
-package-lock.json

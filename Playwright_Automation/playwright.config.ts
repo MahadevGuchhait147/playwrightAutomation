@@ -3,41 +3,38 @@ import { config as loadEnv } from 'dotenv';
 
 loadEnv({ quiet: true });
 
+const baseUrl = process.env.BASE_URL ?? 'https://qaplayground.com';
+const isCI = !!process.env.CI;
+
 export default defineConfig({
-  testDir: './Tests',
+  // Test discovery
+  testDir: './tests',
   testMatch: '**/*.spec.ts',
-  testIgnore: '**/unit/**/*.test.ts',
 
+  // Runtime settings
   timeout: 30_000,
-
   expect: {
     timeout: 5_000
   },
-
   fullyParallel: true,
-
-  forbidOnly: !!process.env.CI,
-
-  retries: process.env.CI ? 1 : 0,
-
+  forbidOnly: isCI,
+  retries: isCI ? 1 : 0,
   workers: 1,
 
-  reporter: [['list'], ['html', { open: 'never' }]],
+  // Reporters
+  reporter: [['list'], ['html', { open: 'never', outputFolder: './playwright-report' }]],
 
+  // Shared browser context options
   use: {
-    baseURL: process.env.BASE_URL ?? 'https://www.saucedemo.com',
-
+    baseURL: baseUrl,
     trace: 'on',
-
     screenshot: 'only-on-failure',
-
     video: 'retain-on-failure',
-
     actionTimeout: 10_000,
-
     navigationTimeout: 30_000
   },
 
+  // Browser projects
   projects: [
     {
       name: 'chromium',
@@ -47,5 +44,6 @@ export default defineConfig({
     }
   ],
 
-  outputDir: 'test-results'
+  // Artifacts
+  outputDir: './test-results'
 });

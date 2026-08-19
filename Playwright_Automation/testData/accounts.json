@@ -1,0 +1,16 @@
+{
+  "existingAccount": {
+    "name": "Everyday Checking",
+    "number": "****4321",
+    "type": "Checking",
+    "balance": "$4,250.00",
+    "status": "Active"
+  },
+  "savingsAccount": {
+    "name": "High-Yield Savings",
+    "number": "****8765",
+    "type": "Savings",
+    "balance": "$12,800.00",
+    "status": "Active"
+  }
+}

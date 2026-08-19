@@ -3,9 +3,8 @@
   "private": true,
   "scripts": {
     "test": "npm --prefix Playwright_Automation test",
-    "test:unit": "vitest run --config vitest.config.mjs",
-    "test:unit:watch": "vitest --config vitest.config.mjs",
-    "test:mutation": "stryker run",
+    "test:unit": "npm --prefix Playwright_Automation run test:unit",
+    "test:mutate": "npm --prefix Playwright_Automation run test:mutate",
     "test:headed": "npm --prefix Playwright_Automation run test:headed",
     "test:ui": "npm --prefix Playwright_Automation run test:ui",
     "report": "npm --prefix Playwright_Automation run report",
@@ -15,36 +14,10 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.1",
-    "@stryker-mutator/core": "^9.6.1",
-    "@stryker-mutator/typescript-checker": "^9.6.1",
-    "@stryker-mutator/vitest-runner": "^9.6.1",
-    "@types/node": "^26.2.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
-    "prettier": "^3.9.6",
-    "typescript": "^5.7.3",
-    "vitest": "^4.1.10"
+    "prettier": "^3.9.6"
   },
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "dependencies": {
-    "@testdino/playwright": "^2.3.1",
-    "playwright-core": "^1.62.1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Mahadev-clanap/Automation-demo.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Mahadev-clanap/Automation-demo/issues"
-  },
-  "homepage": "https://github.com/Mahadev-clanap/Automation-demo#readme",
   "lint-staged": {
     "Playwright_Automation/**/*.{ts,js,json,yml,yaml,md}": "prettier --write --config Playwright_Automation/.prettierrc"
   }

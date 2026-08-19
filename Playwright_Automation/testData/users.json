@@ -1,0 +1,11 @@
+{
+  "valid": {
+    "username": "standard_user",
+    "password": "bank_sauce"
+  },
+  "invalid": {
+    "username": "invalid_user",
+    "password": "invalid_password",
+    "errorMessage": "The username or password you entered is incorrect."
+  }
+}
