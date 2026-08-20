@@ -24,7 +24,8 @@ jobs:
         working-directory: Playwright_Automation
 
     env:
-      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || '/' }}
+      BASE_URL: ${{ vars.BASE_URL || 'https://qaplayground.com' }}
+      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || '/bank/login' }}
       QA_COMPANY_USERNAME: ${{ secrets.QA_COMPANY_USERNAME }}
       QA_COMPANY_PASSWORD: ${{ secrets.QA_COMPANY_PASSWORD }}
 

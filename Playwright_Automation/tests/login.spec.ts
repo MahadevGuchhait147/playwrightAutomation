@@ -1,9 +1,10 @@
 import { test } from '../fixtures/testFixtures';
 import users from '../testData/users.json';
+import { getBankLoginPath } from '../utils/env';
 
 test.describe('QA Playground bank login', () => {
   test.beforeEach(async ({ loginPage }) => {
-    await loginPage.goto(process.env.QA_COMPANY_PATH ?? '/bank/login');
+    await loginPage.goto(getBankLoginPath());
     await loginPage.expectLoginPage();
   });
 
