@@ -5,7 +5,6 @@ loadEnv({ quiet: true });
 
 const baseUrl = process.env.BASE_URL ?? 'https://qaplayground.com';
 const isCI = !!process.env.CI;
-const isStryker = process.env.STRYKER === '1';
 
 export default defineConfig({
   // Test discovery
@@ -19,20 +18,22 @@ export default defineConfig({
   },
   fullyParallel: true,
   forbidOnly: isCI,
-  retries: isStryker ? 0 : isCI ? 1 : 0,
+  retries: 1,
   workers: 1,
 
   // Reporters
-  reporter: isStryker
-    ? [['dot']]
-    : [['list'], ['html', { open: 'never', outputFolder: './playwright-report' }]],
+  reporter: [
+    ['list'],
+    ['html', { open: 'never', outputFolder: './playwright-report' }],
+    ['./reporters/flaky-reporter.ts', { historyFile: 'test-results/flaky-history.json' }]
+  ],
 
   // Shared browser context options
   use: {
     baseURL: baseUrl,
-    trace: isStryker ? 'off' : 'on',
-    screenshot: isStryker ? 'off' : 'only-on-failure',
-    video: isStryker ? 'off' : 'retain-on-failure',
+    trace: 'on',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
     actionTimeout: 10_000,
     navigationTimeout: 30_000
   },
@@ -47,6 +48,6 @@ export default defineConfig({
     }
   ],
 
-  // Artifacts
-  outputDir: './test-results'
+  // Artifacts (kept under test-results/artifacts so flaky-history.json is not wiped)
+  outputDir: './test-results/artifacts'
 });

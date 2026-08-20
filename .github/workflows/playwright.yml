@@ -16,16 +16,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  mutate:
+  test:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
 
     defaults:
       run:
         working-directory: Playwright_Automation
 
     env:
-      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || '/bank/login' }}
+      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || '/' }}
       QA_COMPANY_USERNAME: ${{ secrets.QA_COMPANY_USERNAME }}
       QA_COMPANY_PASSWORD: ${{ secrets.QA_COMPANY_PASSWORD }}
 
@@ -36,7 +35,17 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: Playwright_Automation/package-lock.json
+          cache-dependency-path: |
+            package-lock.json
+            Playwright_Automation/package-lock.json
+
+      - name: Install root dependencies
+        run: npm ci
+        working-directory: .
+
+      - name: Run unit tests (Vitest)
+        run: npm run test:unit
+        working-directory: .
 
       - name: Install dependencies
         run: npm ci
@@ -44,186 +53,153 @@ jobs:
       - name: Install browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Run Vitest
-        run: npx vitest run --reporter=json --outputFile=vitest-report.json
+      - name: Ensure flaky history directory exists
+        run: mkdir -p test-results
 
-      - name: Show Vitest results
+      - name: Restore flaky history cache
+        id: flaky-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: Playwright_Automation/test-results/flaky-history.json
+          key: flaky-history-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            flaky-history-${{ github.ref_name }}-
+            flaky-history-
+
+      - name: Run Playwright tests
+        id: e2e
+        run: npm test
+
+      - name: Save flaky history cache
         if: always()
-        run: |
-          node <<'EOF'
-          const fs = require('fs');
-          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
-          const reportPath = 'vitest-report.json';
-          if (!summaryPath) process.exit(0);
-          let body = '## Vitest\n\nNo vitest-report.json was produced.\n';
-          if (fs.existsSync(reportPath)) {
-            const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-            body = [
-              '## Vitest',
-              '',
-              `| Metric | Count |`,
-              `| --- | ---: |`,
-              `| Test files | ${report.numTotalTestSuites ?? 0} |`,
-              `| Passed | ${report.numPassedTests ?? 0} |`,
-              `| Failed | ${report.numFailedTests ?? 0} |`,
-              `| Total tests | ${report.numTotalTests ?? 0} |`,
-              '',
-            ].join('\n');
-          }
-          fs.appendFileSync(summaryPath, body);
-          EOF
+        uses: actions/cache/save@v4
+        with:
+          path: Playwright_Automation/test-results/flaky-history.json
+          key: flaky-history-${{ github.ref_name }}-${{ github.run_id }}
 
-      - name: Run Stryker
-        env:
-          GITHUB_ACTIONS: 'false'
-          GITHUB_STEP_SUMMARY: /dev/null
-        run: npm run test:mutate
-
-      - name: Show Stryker results
-        if: always()
-        run: |
-          node <<'EOF'
-          const fs = require('fs');
-          const reportPath = 'stryker-report/mutation.json';
-          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
-          if (!fs.existsSync(reportPath) || !summaryPath) {
-            console.log('Stryker JSON report not found.');
-            process.exit(0);
-          }
-          const report = JSON.parse(fs.readFileSync(reportPath, 'utf8'));
-          const mutants = Object.values(report.files || {}).flatMap((file) => file.mutants || []);
-          const counts = mutants.reduce((acc, mutant) => {
-            acc[mutant.status] = (acc[mutant.status] || 0) + 1;
-            return acc;
-          }, {});
-          const killed = counts.Killed || 0;
-          const survived = counts.Survived || 0;
-          const noCoverage = counts.NoCoverage || 0;
-          const timeout = counts.Timeout || 0;
-          const total = mutants.length;
-          const detected = killed + (counts.Timeout || 0) + (counts.RuntimeError || 0) + (counts.CompileError || 0);
-          const covered = total - noCoverage;
-          const score = total ? ((detected / total) * 100).toFixed(2) : '0.00';
-          const coveredScore = covered ? ((killed / covered) * 100).toFixed(2) : '0.00';
-          const lines = [
-            '## Stryker mutation report',
-            '',
-            `| Metric | Count |`,
-            `| --- | ---: |`,
-            `| Total mutants | ${total} |`,
-            `| Killed | ${killed} |`,
-            `| Survived | ${survived} |`,
-            `| No coverage | ${noCoverage} |`,
-            `| Timeout | ${timeout} |`,
-            `| Mutation score | ${score}% |`,
-            `| Score (covered) | ${coveredScore}% |`,
-            '',
-            'GitHub Pages: [Stryker report](https://mahadev-clanap.github.io/Automation-demo/stryker/)',
-            '',
-          ];
-          fs.appendFileSync(summaryPath, lines.join('\n'));
-          console.log(lines.join('\n'));
-          EOF
-
-      - name: Upload Stryker report
+      - name: Upload flaky history artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: stryker-report
-          path: Playwright_Automation/stryker-report
+          name: flaky-history
+          path: Playwright_Automation/test-results/flaky-history.json
           if-no-files-found: warn
+          retention-days: 30
 
-  e2e-test:
-    runs-on: ubuntu-latest
-
-    defaults:
-      run:
-        working-directory: Playwright_Automation
-
-    env:
-      QA_COMPANY_PATH: ${{ vars.QA_COMPANY_PATH || '/bank/login' }}
-      QA_COMPANY_USERNAME: ${{ secrets.QA_COMPANY_USERNAME }}
-      QA_COMPANY_PASSWORD: ${{ secrets.QA_COMPANY_PASSWORD }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-          cache-dependency-path: Playwright_Automation/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Install browsers
-        run: npx playwright install --with-deps chromium
-
-      - name: Run Playwright tests
-        run: npm test
-
-      - name: Upload Playwright report
+      - name: Upload Playwright HTML report artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: playwright-report
           path: Playwright_Automation/playwright-report
           if-no-files-found: warn
+          retention-days: 14
 
-  pages:
-    needs: [mutate, e2e-test]
-    if: always() && !cancelled()
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Download Playwright report
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: playwright-report
-          path: site/playwright
-
-      - name: Download Stryker report
-        continue-on-error: true
-        uses: actions/download-artifact@v4
-        with:
-          name: stryker-report
-          path: site/stryker
-
-      - name: Create report home page
+      - name: Write flaky report to job summary
+        if: always()
+        working-directory: .
         run: |
-          mkdir -p site
-          cat > site/index.html <<'EOF'
-          <!DOCTYPE html>
-          <html lang="en">
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1" />
-              <title>Automation-demo reports</title>
-              <style>
-                body { font-family: sans-serif; max-width: 640px; margin: 48px auto; padding: 0 16px; }
-                a { display: block; margin: 12px 0; font-size: 1.1rem; }
-              </style>
-            </head>
-            <body>
-              <h1>Automation-demo reports</h1>
-              <a href="./playwright/index.html">Playwright e2e report</a>
-              <a href="./stryker/index.html">Stryker mutation report</a>
-            </body>
-          </html>
+          node <<'EOF'
+          const fs = require('fs');
+          const historyPath = 'Playwright_Automation/test-results/flaky-history.json';
+          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+
+          let md = '## Flaky test report\n\n';
+
+          if (!fs.existsSync(historyPath)) {
+            md += '_No flaky history file found._\n';
+            fs.appendFileSync(summaryPath, md);
+            process.exit(0);
+          }
+
+          const history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
+          const tests = Object.values(history.tests || {});
+          const flakyTests = tests
+            .filter((t) => (t.flaky || 0) > 0)
+            .sort((a, b) => (b.flakyRate || 0) - (a.flakyRate || 0));
+          const flakyThisRun = tests.filter((t) => t.lastStatus === 'flaky');
+
+          md += `| Metric | Value |\n|---|---|\n`;
+          md += `| Total tracked runs | ${history.totalRuns ?? 0} |\n`;
+          md += `| Last updated | ${history.updatedAt ?? 'n/a'} |\n`;
+          md += `| Flaky in this run | ${flakyThisRun.length} |\n`;
+          md += `| Tests with flaky history | ${flakyTests.length} |\n\n`;
+
+          if (flakyThisRun.length) {
+            md += '### Flaky in this run\n\n';
+            for (const t of flakyThisRun) {
+              md += `- \`${t.file}\` › **${t.title}**\n`;
+            }
+            md += '\n';
+          } else {
+            md += '_No flaky tests in this run._\n\n';
+          }
+
+          if (flakyTests.length) {
+            md += '### Top flaky tests (history)\n\n';
+            md += '| Test | File | Flaky | Total | Rate |\n|---|---|---:|---:|---:|\n';
+            for (const t of flakyTests.slice(0, 20)) {
+              const rate = `${((t.flakyRate || 0) * 100).toFixed(1)}%`;
+              md += `| ${t.title} | \`${t.file}\` | ${t.flaky} | ${t.totalRuns} | ${rate} |\n`;
+            }
+            md += '\n';
+          }
+
+          md += 'Download the **flaky-history** artifact for the full JSON history.\n';
+          fs.appendFileSync(summaryPath, md);
           EOF
 
+      - name: Build GitHub Pages report site
+        if: always()
+        working-directory: .
+        run: |
+          mkdir -p site/playwright
+          if [ -d Playwright_Automation/playwright-report ]; then
+            cp -R Playwright_Automation/playwright-report/. site/playwright/
+          fi
+          if [ -f Playwright_Automation/test-results/flaky-history.json ]; then
+            cp Playwright_Automation/test-results/flaky-history.json site/flaky-history.json
+          else
+            echo '{"updatedAt":null,"totalRuns":0,"tests":{}}' > site/flaky-history.json
+          fi
+          cat > site/index.html <<'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>Automation Demo Reports</title>
+            <style>
+              body { font-family: system-ui, sans-serif; max-width: 720px; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
+              a { color: #0969da; }
+              code { background: #f6f8fa; padding: 0.1rem 0.35rem; border-radius: 4px; }
+              ul { padding-left: 1.2rem; }
+            </style>
+          </head>
+          <body>
+            <h1>Automation Demo Reports</h1>
+            <ul>
+              <li><a href="./playwright/">Playwright HTML report</a></li>
+              <li><a href="./flaky-history.json">Flaky history (JSON)</a></li>
+            </ul>
+            <p>Flaky detection uses Playwright retries + <code>reporters/flaky-reporter.ts</code>.</p>
+          </body>
+          </html>
+          HTML
+
       - name: Setup Pages
+        if: always()
         uses: actions/configure-pages@v5
 
-      - name: Upload GitHub Pages
+      - name: Upload Pages artifact
+        if: always()
         uses: actions/upload-pages-artifact@v3
         with:
           path: site
 
   deploy:
-    needs: pages
+    needs: test
+    if: always() && needs.test.result != 'cancelled'
 
     environment:
       name: github-pages

@@ -16,6 +16,7 @@
     "fixtures/**/*.ts",
     "utils/**/*.ts",
     "unit/**/*.ts",
+    "reporters/**/*.ts",
     "playwright.config.ts"
   ]
 }

@@ -4,7 +4,6 @@
   "scripts": {
     "test": "npm --prefix Playwright_Automation test",
     "test:unit": "npm --prefix Playwright_Automation run test:unit",
-    "test:mutate": "npm --prefix Playwright_Automation run test:mutate",
     "test:headed": "npm --prefix Playwright_Automation run test:headed",
     "test:ui": "npm --prefix Playwright_Automation run test:ui",
     "report": "npm --prefix Playwright_Automation run report",
