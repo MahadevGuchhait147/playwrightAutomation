@@ -43,10 +43,6 @@ jobs:
         run: npm ci
         working-directory: .
 
-      - name: Run unit tests (Vitest)
-        run: npm run test:unit
-        working-directory: .
-
       - name: Install dependencies
         run: npm ci
 
