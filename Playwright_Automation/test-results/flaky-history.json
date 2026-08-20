@@ -1,6 +1,6 @@
 {
-  "updatedAt": "2026-08-20T09:48:44.632Z",
-  "totalRuns": 8,
+  "updatedAt": "2026-08-20T10:00:30.298Z",
+  "totalRuns": 10,
   "tests": {
     "chromium | tests/accounts.spec.ts | accounts.spec.ts > QA Playground bank accounts > creates a new account and verifies existing account details": {
       "title": "creates a new account and verifies existing account details",
@@ -99,13 +99,13 @@
       "title": "forced flaky check fails once then passes",
       "file": "tests/flaky-check.spec.ts",
       "project": "chromium",
-      "totalRuns": 4,
+      "totalRuns": 6,
       "passed": 0,
       "failed": 0,
-      "flaky": 4,
+      "flaky": 6,
       "skipped": 0,
       "lastStatus": "flaky",
-      "lastRunAt": "2026-08-20T09:29:01.670Z",
+      "lastRunAt": "2026-08-20T10:00:30.298Z",
       "flakyRate": 1,
       "recent": [
         {
@@ -123,6 +123,14 @@
         {
           "status": "flaky",
           "runAt": "2026-08-20T09:29:01.670Z"
+        },
+        {
+          "status": "flaky",
+          "runAt": "2026-08-20T09:58:19.192Z"
+        },
+        {
+          "status": "flaky",
+          "runAt": "2026-08-20T10:00:30.298Z"
         }
       ]
     }

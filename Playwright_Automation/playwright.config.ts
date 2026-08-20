@@ -25,7 +25,14 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html', { open: 'never', outputFolder: './playwright-report' }],
-    ['./reporters/flaky-reporter.ts', { historyFile: 'test-results/flaky-history.json' }]
+    ['json', { outputFile: 'test-results/results.json' }],
+    [
+      './reporters/flaky-reporter.ts',
+      {
+        historyFile: 'test-results/flaky-history.json',
+        htmlFile: 'flaky-report/index.html'
+      }
+    ]
   ],
 
   // Shared browser context options

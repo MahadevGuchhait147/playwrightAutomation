@@ -10,6 +10,7 @@
     "test:unit": "vitest run",
     "test:unit:watch": "vitest",
     "report": "playwright show-report",
+    "report:flaky": "open flaky-report/index.html || xdg-open flaky-report/index.html",
     "install:browsers": "playwright install",
     "format": "prettier --write .",
     "format:check": "prettier --check ."

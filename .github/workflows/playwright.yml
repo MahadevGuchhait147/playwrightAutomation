@@ -83,6 +83,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      - name: Upload Playwright JSON results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-json
+          path: Playwright_Automation/test-results/results.json
+          if-no-files-found: warn
+          retention-days: 30
+
       - name: Upload Playwright HTML report artifact
         if: always()
         uses: actions/upload-artifact@v4
@@ -91,6 +100,15 @@ jobs:
           path: Playwright_Automation/playwright-report
           if-no-files-found: warn
           retention-days: 14
+
+      - name: Upload Flaky HTML report artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flaky-report
+          path: Playwright_Automation/flaky-report
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Write flaky report to job summary
         if: always()
@@ -150,14 +168,20 @@ jobs:
         if: always()
         working-directory: .
         run: |
-          mkdir -p site/playwright
+          mkdir -p site/playwright site/flaky
           if [ -d Playwright_Automation/playwright-report ]; then
             cp -R Playwright_Automation/playwright-report/. site/playwright/
+          fi
+          if [ -d Playwright_Automation/flaky-report ]; then
+            cp -R Playwright_Automation/flaky-report/. site/flaky/
           fi
           if [ -f Playwright_Automation/test-results/flaky-history.json ]; then
             cp Playwright_Automation/test-results/flaky-history.json site/flaky-history.json
           else
             echo '{"updatedAt":null,"totalRuns":0,"tests":{}}' > site/flaky-history.json
+          fi
+          if [ -f Playwright_Automation/test-results/results.json ]; then
+            cp Playwright_Automation/test-results/results.json site/results.json
           fi
           cat > site/index.html <<'HTML'
           <!DOCTYPE html>
@@ -177,6 +201,8 @@ jobs:
             <h1>Automation Demo Reports</h1>
             <ul>
               <li><a href="./playwright/">Playwright HTML report</a></li>
+              <li><a href="./flaky/">Flaky HTML report</a></li>
+              <li><a href="./results.json">Playwright results (JSON)</a></li>
               <li><a href="./flaky-history.json">Flaky history (JSON)</a></li>
             </ul>
             <p>Flaky detection uses Playwright retries + <code>reporters/flaky-reporter.ts</code>.</p>
