@@ -23,8 +23,7 @@ export default defineConfig({
   // Reporters
   reporter: [
     ['list'],
-    ['html', { open: 'never', outputFolder: './playwright-report' }],
-    ['json', { outputFile: 'test-results/results.json' }]
+    ['html', { open: 'never', outputFolder: './playwright-report' }]
   ],
 
   // Shared browser context options

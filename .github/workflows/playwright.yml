@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - create-playwright-framwork
+      - main
   workflow_dispatch:
 
 jobs:
@@ -44,15 +45,6 @@ jobs:
       - name: Run Playwright tests
         id: e2e
         run: npm test
-
-      - name: Upload Playwright JSON results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-results-json
-          path: Playwright_Automation/test-results/results.json
-          if-no-files-found: warn
-          retention-days: 30
 
       - name: Upload Playwright HTML report artifact
         if: always()
