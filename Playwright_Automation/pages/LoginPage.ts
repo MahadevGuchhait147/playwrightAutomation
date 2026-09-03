@@ -8,12 +8,22 @@ import {
 } from '../utils/helpers';
 
 export class LoginPage {
+  private static readonly defaultLoginPath = '/bank/login';
+
   page: Page;
   usernameInput: Locator;
   passwordInput: Locator;
   loginButton: Locator;
   errorMessage: Locator;
   logoutButton: Locator;
+
+  static getBankLoginPath(): string {
+    const raw = process.env.QA_COMPANY_PATH?.trim();
+    if (!raw || raw === '/') {
+      return LoginPage.defaultLoginPath;
+    }
+    return raw.startsWith('/') ? raw : `/${raw}`;
+  }
 
   // Initialize page and all login page locators
   constructor(page: Page) {

@@ -2,7 +2,6 @@ import { test as base, expect } from '@playwright/test';
 import { AccountsPage } from '../pages/AccountsPage';
 import { LoginPage } from '../pages/LoginPage';
 import users from '../testData/users.json';
-import { getBankLoginPath } from '../utils/env';
 
 type TestFixtures = {
   loginPage: LoginPage;
@@ -24,7 +23,7 @@ export const test = base.extend<TestFixtures>({
       const username = process.env.QA_COMPANY_USERNAME ?? users.valid.username;
       const password = process.env.QA_COMPANY_PASSWORD ?? users.valid.password;
 
-      await loginPage.goto(getBankLoginPath());
+      await loginPage.goto(LoginPage.getBankLoginPath());
       await loginPage.login(username, password);
       await loginPage.expectLoggedIn();
     });

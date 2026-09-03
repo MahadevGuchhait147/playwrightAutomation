@@ -1,13 +1,7 @@
 node_modules/
 artifacts/
 test-results/**
-!test-results/
-!test-results/flaky-history.json
 Playwright_Automation/test-results/**
-!Playwright_Automation/test-results/
-!Playwright_Automation/test-results/flaky-history.json
 playwright-report/
-flaky-report/
-vitest-report.json
 .env
 .DS_Store

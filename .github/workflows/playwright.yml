@@ -50,38 +50,9 @@ jobs:
       - name: Install browsers
         run: npx playwright install --with-deps chromium
 
-      - name: Ensure flaky history directory exists
-        run: mkdir -p test-results
-
-      - name: Restore flaky history cache
-        id: flaky-cache
-        uses: actions/cache/restore@v4
-        with:
-          path: Playwright_Automation/test-results/flaky-history.json
-          key: flaky-history-${{ github.ref_name }}-${{ github.run_id }}
-          restore-keys: |
-            flaky-history-${{ github.ref_name }}-
-            flaky-history-
-
       - name: Run Playwright tests
         id: e2e
         run: npm test
-
-      - name: Save flaky history cache
-        if: always()
-        uses: actions/cache/save@v4
-        with:
-          path: Playwright_Automation/test-results/flaky-history.json
-          key: flaky-history-${{ github.ref_name }}-${{ github.run_id }}
-
-      - name: Upload flaky history artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: flaky-history
-          path: Playwright_Automation/test-results/flaky-history.json
-          if-no-files-found: warn
-          retention-days: 30
 
       - name: Upload Playwright JSON results
         if: always()
@@ -101,79 +72,13 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Upload Flaky HTML report artifact
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: flaky-report
-          path: Playwright_Automation/flaky-report
-          if-no-files-found: warn
-          retention-days: 30
-
-      - name: Write flaky report to job summary
-        if: always()
-        working-directory: .
-        run: |
-          node <<'EOF'
-          const fs = require('fs');
-          const historyPath = 'Playwright_Automation/test-results/flaky-history.json';
-          const summaryPath = process.env.GITHUB_STEP_SUMMARY;
-
-          let md = '## Flaky test report\n\n';
-
-          if (!fs.existsSync(historyPath)) {
-            md += '_No flaky history file found._\n';
-            fs.appendFileSync(summaryPath, md);
-            process.exit(0);
-          }
-
-          const history = JSON.parse(fs.readFileSync(historyPath, 'utf8'));
-          const tests = Object.values(history.tests || {});
-          const flakyTests = tests
-            .filter((t) => (t.flaky || 0) > 0)
-            .sort((a, b) => (b.flakyRate || 0) - (a.flakyRate || 0));
-          const flakyThisRun = tests.filter((t) => t.lastStatus === 'flaky');
-
-          md += `| Metric | Value |\n|---|---|\n`;
-          md += `| Total tracked runs | ${history.totalRuns ?? 0} |\n`;
-          md += `| Last updated | ${history.updatedAt ?? 'n/a'} |\n`;
-          md += `| Flaky in this run | ${flakyThisRun.length} |\n`;
-          md += `| Tests with flaky history | ${flakyTests.length} |\n\n`;
-
-          if (flakyThisRun.length) {
-            md += '### Flaky in this run\n\n';
-            for (const t of flakyThisRun) {
-              md += `- \`${t.file}\` › **${t.title}**\n`;
-            }
-            md += '\n';
-          } else {
-            md += '_No flaky tests in this run._\n\n';
-          }
-
-          if (flakyTests.length) {
-            md += '### Top flaky tests (history)\n\n';
-            md += '| Test | File | Flaky | Total | Rate |\n|---|---|---:|---:|---:|\n';
-            for (const t of flakyTests.slice(0, 20)) {
-              const rate = `${((t.flakyRate || 0) * 100).toFixed(1)}%`;
-              md += `| ${t.title} | \`${t.file}\` | ${t.flaky} | ${t.totalRuns} | ${rate} |\n`;
-            }
-            md += '\n';
-          }
-
-          md += 'Download the **flaky-history** artifact for the full JSON history.\n';
-          fs.appendFileSync(summaryPath, md);
-          EOF
-
       - name: Build GitHub Pages report site
         if: always()
         working-directory: .
         run: |
-          mkdir -p site/playwright site/flaky
+          mkdir -p site/playwright
           if [ -d Playwright_Automation/playwright-report ]; then
             cp -R Playwright_Automation/playwright-report/. site/playwright/
-          fi
-          if [ -d Playwright_Automation/flaky-report ]; then
-            cp -R Playwright_Automation/flaky-report/. site/flaky/
           fi
           cat > site/index.html <<'HTML'
           <!DOCTYPE html>
@@ -193,9 +98,7 @@ jobs:
             <h1>Automation Demo Reports</h1>
             <ul>
               <li><a href="./playwright/">Playwright HTML report</a></li>
-              <li><a href="./flaky/">Flaky HTML report</a></li>
             </ul>
-            <p>Flaky detection uses Playwright retries + <code>reporters/flaky-reporter.ts</code>.</p>
           </body>
           </html>
           HTML

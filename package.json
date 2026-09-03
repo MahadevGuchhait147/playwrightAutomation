@@ -3,11 +3,9 @@
   "private": true,
   "scripts": {
     "test": "npm --prefix Playwright_Automation test",
-    "test:unit": "npm --prefix Playwright_Automation run test:unit",
     "test:headed": "npm --prefix Playwright_Automation run test:headed",
     "test:ui": "npm --prefix Playwright_Automation run test:ui",
     "report": "npm --prefix Playwright_Automation run report",
-    "report:flaky": "npm --prefix Playwright_Automation run report:flaky",
     "install:browsers": "npm --prefix Playwright_Automation run install:browsers",
     "format": "npm --prefix Playwright_Automation run format",
     "format:check": "npm --prefix Playwright_Automation run format:check",

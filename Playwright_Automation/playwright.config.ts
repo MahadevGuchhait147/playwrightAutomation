@@ -18,21 +18,13 @@ export default defineConfig({
   },
   fullyParallel: true,
   forbidOnly: isCI,
-  retries: 1,
   workers: 1,
 
   // Reporters
   reporter: [
     ['list'],
     ['html', { open: 'never', outputFolder: './playwright-report' }],
-    ['json', { outputFile: 'test-results/results.json' }],
-    [
-      './reporters/flaky-reporter.ts',
-      {
-        historyFile: 'test-results/flaky-history.json',
-        htmlFile: 'flaky-report/index.html'
-      }
-    ]
+    ['json', { outputFile: 'test-results/results.json' }]
   ],
 
   // Shared browser context options
@@ -55,6 +47,5 @@ export default defineConfig({
     }
   ],
 
-  // Artifacts (kept under test-results/artifacts so flaky-history.json is not wiped)
   outputDir: './test-results/artifacts'
 });

@@ -85,7 +85,7 @@ export class AccountsPage {
     await clickWebElement(row.getByRole('button', { name: 'View' }));
     await assertPageUrl(this.page, '/bank/accounts/');
   }
-
+  
   // Verify account details page shows correct information
   async expectAccountDetails(name: string, balance: string) {
     await visibilityOfElement(this.page.getByRole('heading', { level: 1, name }));
