@@ -6,15 +6,6 @@ on:
       - create-playwright-framwork
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: true
-
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -72,57 +63,3 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-      - name: Build GitHub Pages report site
-        if: always()
-        working-directory: .
-        run: |
-          mkdir -p site/playwright
-          if [ -d Playwright_Automation/playwright-report ]; then
-            cp -R Playwright_Automation/playwright-report/. site/playwright/
-          fi
-          cat > site/index.html <<'HTML'
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>Automation Demo Reports</title>
-            <style>
-              body { font-family: system-ui, sans-serif; max-width: 720px; margin: 3rem auto; padding: 0 1rem; line-height: 1.5; }
-              a { color: #0969da; }
-              code { background: #f6f8fa; padding: 0.1rem 0.35rem; border-radius: 4px; }
-              ul { padding-left: 1.2rem; }
-            </style>
-          </head>
-          <body>
-            <h1>Automation Demo Reports</h1>
-            <ul>
-              <li><a href="./playwright/">Playwright HTML report</a></li>
-            </ul>
-          </body>
-          </html>
-          HTML
-
-      - name: Setup Pages
-        if: always()
-        uses: actions/configure-pages@v5
-
-      - name: Upload Pages artifact
-        if: always()
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: site
-
-  deploy:
-    needs: test
-    if: always() && needs.test.result != 'cancelled'
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4
